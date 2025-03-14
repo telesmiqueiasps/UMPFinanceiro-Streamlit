@@ -17,8 +17,6 @@ import re
 import requests
 from dotenv import load_dotenv
 
-# Configuração de localização para formatar moeda
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Definir localidade
 
 def format_currency_brl(value, include_symbol=True):
     formatted = f"{value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
