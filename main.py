@@ -18,12 +18,8 @@ import requests
 from dotenv import load_dotenv
 
 
-try:
-     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
- except locale.Error:
-     locale.setlocale(locale.LC_ALL, 'C.UTF-8')
-     # Instead of falling back to 'C.UTF-8', raise an error or handle manually
-     raise ValueError("Required locale 'pt_BR.UTF-8' is not available. Currency formatting will not work.")
+def format_currency_brl(value):
+     return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
  
  load_dotenv()
  
