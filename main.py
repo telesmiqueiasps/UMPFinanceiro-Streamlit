@@ -675,8 +675,53 @@ def logout():
     st.rerun()
 
 def index_page():
-    st.title(f"Bem-vindo, {st.session_state['current_user']}!")
-    
+    # Injetar CSS personalizado para melhorar a aparência
+    st.markdown(
+        """
+        <style>
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1E3A8A;
+            margin-bottom: 1rem;
+        }
+        .subheader {
+            font-size: 1.5rem;
+            color: #3B82F6;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .metric-card {
+            background-color: #BFDBFE;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metric-label {
+            font-size: 1rem;
+            color: #1E3A8A;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563EB;
+        }
+        .info-box {
+            background-color: #F1F5F9;
+            border-left: 5px solid #3B82F6;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Título estilizado
+    st.markdown(f"<div class='title'>Bem-vindo, {st.session_state['current_user']}!</div>", unsafe_allow_html=True)
+
+    # Configuração inicial
     config = session.query(Configuracao).filter_by(id_usuario=st.session_state['user_id']).first()
     if not config:
         config = Configuracao(
@@ -689,6 +734,7 @@ def index_page():
         session.add(config)
         session.commit()
 
+    # Cálculos financeiros
     outras_receitas = session.query(db.func.sum(Lancamento.valor)).filter(Lancamento.tipo == "Outras Receitas").scalar() or 0
     aci_recebida = session.query(db.func.sum(Lancamento.valor)).filter(Lancamento.tipo == "ACI Recebida").scalar() or 0
     outras_despesas = session.query(db.func.sum(Lancamento.valor)).filter(Lancamento.tipo == "Outras Despesas").scalar() or 0
@@ -698,6 +744,7 @@ def index_page():
     despesas = outras_despesas + aci_enviada
     saldo_final = (config.saldo_inicial or 0) + receitas - despesas
 
+    # Formatação dos valores
     saldo_formatado = format_currency_brl(config.saldo_inicial or 0)
     receitas_formatadas = format_currency_brl(receitas)
     despesas_formatadas = format_currency_brl(despesas)
@@ -707,25 +754,59 @@ def index_page():
     outras_despesas_formatadas = format_currency_brl(outras_despesas)
     aci_enviada_formatada = format_currency_brl(aci_enviada)
 
-    st.subheader(f"Dashboard Financeiro - {config.ano_vigente}")
-    st.write(f"UMP Federação: {config.ump_federacao}")
-    st.write(f"Federação Sínodo: {config.federacao_sinodo}")
+    # Cabeçalho do dashboard
+    st.markdown(f"<div class='subheader'>Dashboard Financeiro - {config.ano_vigente}</div>", unsafe_allow_html=True)
     
+    # Informações gerais em um container estilizado
+    with st.container():
+        st.markdown(
+            f"""
+            <div class='info-box'>
+                <strong>UMP Federação:</strong> {config.ump_federacao}<br>
+                <strong>Federação Sínodo:</strong> {config.federacao_sinodo}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # Métricas principais em colunas
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Saldo Inicial", saldo_formatado)
+        st.markdown(
+            f"<div class='metric-card'><span class='metric-label'>Saldo Inicial</span><br><span class='metric-value'>{saldo_formatado}</span></div>",
+            unsafe_allow_html=True
+        )
     with col2:
-        st.metric("Receitas", receitas_formatadas)
+        st.markdown(
+            f"<div class='metric-card'><span class='metric-label'>Receitas</span><br><span class='metric-value'>{receitas_formatadas}</span></div>",
+            unsafe_allow_html=True
+        )
     with col3:
-        st.metric("Despesas", despesas_formatadas)
-    
-    st.metric("Saldo Final", saldo_final_formatado)
-    
-    st.subheader("Detalhamento")
-    st.write(f"Outras Receitas: {outras_receitas_formatadas}")
-    st.write(f"ACI Recebida: {aci_recebida_formatada}")
-    st.write(f"Outras Despesas: {outras_despesas_formatadas}")
-    st.write(f"ACI Enviada: {aci_enviada_formatada}")
+        st.markdown(
+            f"<div class='metric-card'><span class='metric-label'>Despesas</span><br><span class='metric-value'>{despesas_formatadas}</span></div>",
+            unsafe_allow_html=True
+        )
+
+    # Saldo final em destaque
+    st.markdown(
+        f"<div class='metric-card' style='margin-top: 1rem;'><span class='metric-label'>Saldo Final</span><br><span class='metric-value'>{saldo_final_formatado}</span></div>",
+        unsafe_allow_html=True
+    )
+
+    # Detalhamento em uma seção separada
+    st.markdown("<div class='subheader'>Detalhamento</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown(
+            f"""
+            <div class='info-box'>
+                <strong>Outras Receitas:</strong> {outras_receitas_formatadas}<br>
+                <strong>ACI Recebida:</strong> {aci_recebida_formatada}<br>
+                <strong>Outras Despesas:</strong> {outras_despesas_formatadas}<br>
+                <strong>ACI Enviada:</strong> {aci_enviada_formatada}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 def configuracoes_page():
     st.title("Configurações")
