@@ -30,12 +30,18 @@ if DATABASE_URI.startswith("postgres"):
     DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://")
 
 # Exibir a URI para debug (sem a senha)
-st.write(f"Conectando a: {DATABASE_URI.split('@')[0]}@...")
+st.write(f"Tentando conectar a: {DATABASE_URI.split('@')[0]}@...")
 
 try:
+    # Testar conexão bruta com psycopg2 primeiro
+    conn = psycopg2.connect(DATABASE_URI)
+    conn.close()
+    st.success("Conexão bruta com psycopg2 bem-sucedida!")
+
+    # Criar engine e tabelas
     engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args={"connect_timeout": 10})
     db.Model.metadata.create_all(engine)
-    st.success("Conexão com o banco de dados estabelecida com sucesso!")
+    st.success("Conexão com SQLAlchemy e criação de tabelas bem-sucedida!")
 except Exception as e:
     st.error(f"Erro ao conectar ao banco de dados: {str(e)}")
     raise
