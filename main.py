@@ -18,8 +18,9 @@ import requests
 from dotenv import load_dotenv
 
 # Configuração de localização para formatar moeda
-def format_currency_brl(value):
-    return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+def format_currency_brl(value, include_symbol=True):
+    formatted = f"{value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    return f"R$ {formatted}" if include_symbol else formatted
 
 load_dotenv()
 
@@ -743,7 +744,10 @@ def configuracoes_page():
         socios_cooperadores = st.text_input("Sócios Cooperadores", value=config.socios_cooperadores or "")
         tesoureiro_responsavel = st.text_input("Tesoureiro Responsável", value=config.tesoureiro_responsavel or "")
         email = st.text_input("E-mail", value=config.email or "")
-        saldo_inicial = st.text_input("Saldo Inicial (ex: 1.234,56)", value=locale.currency(config.saldo_inicial or 0, grouping=True, symbol=False))
+        saldo_inicial = st.text_input(
+            "Saldo Inicial (ex: 1.234,56)",
+            value=format_currency_brl(config.saldo_inicial or 0, include_symbol=False)
+        )
 
         submit_button = st.form_submit_button(label="Salvar")
 
