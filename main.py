@@ -16,7 +16,7 @@ import random
 import re
 import requests
 from dotenv import load_dotenv
-import psycopg2
+
 
 
 # Configuração de localização para formatar moeda
@@ -35,12 +35,8 @@ if DATABASE_URI.startswith("postgres"):
 st.write(f"Tentando conectar a: {DATABASE_URI.split('@')[0]}@...")
 
 try:
-    # Forçar IPv4 se necessário (substitua pelo IP real do Supabase se souber)
-    engine = create_engine(
-        DATABASE_URI,
-        pool_pre_ping=True,
-        connect_args={"connect_timeout": 10, "host": "db.iedqhrfzpyhpejeqrqxu.supabase.co"}
-    )
+    # Criar engine e tabelas
+    engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args={"connect_timeout": 10})
     db.Model.metadata.create_all(engine)
     st.success("Conexão com o banco de dados e criação de tabelas bem-sucedida!")
 except Exception as e:
