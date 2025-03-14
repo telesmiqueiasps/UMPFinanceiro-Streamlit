@@ -18,20 +18,39 @@ import requests
 from dotenv import load_dotenv
 
 
-def format_currency_brl(value):
-     return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
- 
-load_dotenv()
- 
-# Configuração do banco
-DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
-engine = create_engine(DATABASE_URI)
-db.Model.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
+def format_currency_brl(value, include_symbol=True):
+    formatted = f"{value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    return f"R$ {formatted}" if include_symbol else formatted
 
-# Criar sessão global (para compatibilidade com o código atual)
-session = get_session()
+load_dotenv()
+
+# Configuração do banco
+DATABASE_URI = os.getenv("DATABASE_URL")
+if not DATABASE_URI:
+    st.error("Erro: DATABASE_URL não definido nas variáveis de ambiente!")
+    raise ValueError("DATABASE_URL não definido")
+if DATABASE_URI.startswith("postgres"):
+    DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://")
+connect_args = {"connect_timeout": 10}  # Usado apenas para PostgreSQL
+
+# Exibir a URI para debug (sem a senha)
+st.write(f"Tentando conectar a: {DATABASE_URI.split('@')[0]}@...")
+
+try:
+    # Criar engine e tabelas
+    engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args=connect_args)
+    db.Model.metadata.create_all(engine)
+    st.success("Conexão com o banco de dados e criação de tabelas bem-sucedida!")
+    
+    Session = sessionmaker(bind=engine)
+    
+    def get_session():
+        return Session()
+    
+    session = get_session()
+except Exception as e:
+    st.error(f"Erro ao conectar ao banco de dados: {str(e)}")
+    raise
 
 # Configuração de uploads e relatorios
 UPLOAD_FOLDER = 'uploads/'
