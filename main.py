@@ -18,7 +18,11 @@ import requests
 from dotenv import load_dotenv
 
 # Configuração de localização para formatar moeda
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Try Brazilian Portuguese
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')  # Fall back to system's default locale
+    print("Unsupported locale, falling back to default.")
 
 load_dotenv()
 
@@ -362,7 +366,7 @@ def exportar_relatorio(mes=None):
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", size=11)
     resumo_financeiro = [
-        (f"Outras Receitas: R$ {locale.format_string('%.2f', resumo.get('outras_receitas', 0.00), grouping=True)}",
+        (f"Outras Receitas: R$ {.format_string('%.2f', resumo.get('outras_receitas', 0.00), grouping=True)}",
          f"Outras Despesas: R$ {locale.format_string('%.2f', resumo.get('outras_despesas', 0.00), grouping=True)}"),
         (f"ACI Recebida: R$ {locale.format_string('%.2f', resumo.get('aci_recebida', 0.00), grouping=True)}",
          f"ACI Enviada: R$ {locale.format_string('%.2f', resumo.get('aci_enviada', 0.00), grouping=True)}")
