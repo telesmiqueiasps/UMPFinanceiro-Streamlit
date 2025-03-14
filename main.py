@@ -25,11 +25,15 @@ def format_currency_brl(value, include_symbol=True):
 load_dotenv()
 
 # Configuração do banco
-DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
+DATABASE_URI = os.getenv("DATABASE_URL", f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10")
+if DATABASE_URI.startswith("postgres"):  # Ajuste para PostgreSQL no Streamlit Cloud
+    DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://")
 engine = create_engine(DATABASE_URI)
 db.Model.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
-session = Session()
+
+def get_session():
+    return Session()
 
 # Configuração de uploads e relatórios
 UPLOAD_FOLDER = 'uploads/'
