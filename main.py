@@ -795,10 +795,10 @@ def mes_page():
     saidas = sum(l.valor for l in lancamentos if l.tipo in ['Outras Despesas', 'ACI Enviada'])
     saldo = saldo_inicial + entradas - saidas
 
-    saldo_inicial_formatado = locale.currency(saldo_inicial, grouping=True)
-    entradas_formatado = locale.currency(entradas, grouping=True)
-    saidas_formatado = locale.currency(saidas, grouping=True)
-    saldo_formatado = locale.currency(saldo, grouping=True)
+    saldo_inicial_formatado = format_currency_brl(saldo_inicial)
+    entradas_formatado = format_currency_brl(entradas)
+    saidas_formatado = format_currency_brl(saidas)
+    saldo_formatado = format_currency_brl(saldo)
 
     st.subheader(f"Relatório de {mes:02d}/{ano}")
     col1, col2, col3 = st.columns(3)
