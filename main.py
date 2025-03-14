@@ -18,33 +18,21 @@ import requests
 from dotenv import load_dotenv
 
 
-def format_currency_brl(value, include_symbol=True):
-    formatted = f"{value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-    return f"R$ {formatted}" if include_symbol else formatted
-
-load_dotenv()
-
-# Configuração do banco
-DATABASE_URI = os.getenv("DATABASE_URL", f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10")
-if DATABASE_URI.startswith("postgres"):
-    DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://")
-
-# Exibir a URI para debug (sem a senha)
-st.write(f"Tentando conectar a: {DATABASE_URI.split('@')[0]}@...")
-
 try:
-    # Criar engine e tabelas
-    engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args={"connect_timeout": 10})
-    db.Model.metadata.create_all(engine)
-    st.success("Conexão com o banco de dados e criação de tabelas bem-sucedida!")
-except Exception as e:
-    st.error(f"Erro ao conectar ao banco de dados: {str(e)}")
-    raise
-
-Session = sessionmaker(bind=engine)
-
-def get_session():
-    return Session()
+     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+ except locale.Error:
+     locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+     # Instead of falling back to 'C.UTF-8', raise an error or handle manually
+     raise ValueError("Required locale 'pt_BR.UTF-8' is not available. Currency formatting will not work.")
+ 
+ load_dotenv()
+ 
+ # Configuração do banco
+ DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
+ engine = create_engine(DATABASE_URI)
+ db.Model.metadata.create_all(engine)
+ Session = sessionmaker(bind=engine)
+ session = Session()
 
 # Criar sessão global (para compatibilidade com o código atual)
 session = get_session()
