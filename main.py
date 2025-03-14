@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 def format_currency_brl(value):
      return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
  
- load_dotenv()
+load_dotenv()
  
  # Configuração do banco
  DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
