@@ -17,6 +17,7 @@ import re
 import requests
 from dotenv import load_dotenv
 
+
 # Configuração de localização para formatar moeda
 def format_currency_brl(value, include_symbol=True):
     formatted = f"{value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
@@ -33,15 +34,10 @@ if DATABASE_URI.startswith("postgres"):
 st.write(f"Tentando conectar a: {DATABASE_URI.split('@')[0]}@...")
 
 try:
-    # Testar conexão bruta com psycopg2 primeiro
-    conn = psycopg2.connect(DATABASE_URI)
-    conn.close()
-    st.success("Conexão bruta com psycopg2 bem-sucedida!")
-
-    # Criar engine e tabelas
+    # Criar engine e tabelas diretamente
     engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args={"connect_timeout": 10})
     db.Model.metadata.create_all(engine)
-    st.success("Conexão com SQLAlchemy e criação de tabelas bem-sucedida!")
+    st.success("Conexão com o banco de dados e criação de tabelas bem-sucedida!")
 except Exception as e:
     st.error(f"Erro ao conectar ao banco de dados: {str(e)}")
     raise
