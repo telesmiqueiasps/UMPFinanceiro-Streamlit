@@ -22,7 +22,7 @@ try:
     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 except locale.Error:
     # Instead of falling back to 'C.UTF-8', raise an error or handle manually
-    raise ValueError("Required locale 'pt_BR.UTF-8' is not available. Currency formatting will not work.")
+     locale.setlocale(locale.LC_ALL, 'C.UTF-8')
 
 load_dotenv()
 
