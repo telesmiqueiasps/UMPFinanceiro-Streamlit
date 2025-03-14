@@ -775,8 +775,6 @@ def configuracoes_page():
                 st.success("Configurações salvas com sucesso!")
                 st.rerun()
 
-    saldo_formatado = format_currency_brl(config.saldo_inicial or 0)
-    st.write(f"Saldo Inicial Atual: {saldo_formatado}")
 
 def mes_page():
     st.title("Relatório Mensal")
