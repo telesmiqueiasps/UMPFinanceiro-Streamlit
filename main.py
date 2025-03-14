@@ -23,12 +23,12 @@ def format_currency_brl(value):
  
 load_dotenv()
  
- # Configuração do banco
- DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
- engine = create_engine(DATABASE_URI)
- db.Model.metadata.create_all(engine)
- Session = sessionmaker(bind=engine)
- session = Session()
+# Configuração do banco
+DATABASE_URI = f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10"
+engine = create_engine(DATABASE_URI)
+db.Model.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 # Criar sessão global (para compatibilidade com o código atual)
 session = get_session()
