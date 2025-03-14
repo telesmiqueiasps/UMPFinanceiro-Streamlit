@@ -26,10 +26,20 @@ load_dotenv()
 
 # Configuração do banco
 DATABASE_URI = os.getenv("DATABASE_URL", f"sqlite:///{os.path.abspath('instance/database.db')}?timeout=10")
-if DATABASE_URI.startswith("postgres"):  # Ajuste para PostgreSQL no Streamlit Cloud
+if DATABASE_URI.startswith("postgres"):
     DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://")
-engine = create_engine(DATABASE_URI)
-db.Model.metadata.create_all(engine)
+
+# Exibir a URI para debug (sem a senha)
+st.write(f"Conectando a: {DATABASE_URI.split('@')[0]}@...")
+
+try:
+    engine = create_engine(DATABASE_URI, pool_pre_ping=True, connect_args={"connect_timeout": 10})
+    db.Model.metadata.create_all(engine)
+    st.success("Conexão com o banco de dados estabelecida com sucesso!")
+except Exception as e:
+    st.error(f"Erro ao conectar ao banco de dados: {str(e)}")
+    raise
+
 Session = sessionmaker(bind=engine)
 
 def get_session():
