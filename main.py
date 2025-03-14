@@ -18,11 +18,8 @@ import requests
 from dotenv import load_dotenv
 
 # Configuração de localização para formatar moeda
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-except locale.Error:
-    # Instead of falling back to 'C.UTF-8', raise an error or handle manually
-     locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+def format_currency_brl(value):
+    return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
 load_dotenv()
 
@@ -700,14 +697,14 @@ def index_page():
     despesas = outras_despesas + aci_enviada
     saldo_final = (config.saldo_inicial or 0) + receitas - despesas
 
-    saldo_formatado = locale.currency(config.saldo_inicial or 0, grouping=True)
-    receitas_formatadas = locale.currency(receitas, grouping=True)
-    despesas_formatadas = locale.currency(despesas, grouping=True)
-    saldo_final_formatado = locale.currency(saldo_final, grouping=True)
-    outras_receitas_formatadas = locale.currency(outras_receitas, grouping=True)
-    aci_recebida_formatada = locale.currency(aci_recebida, grouping=True)
-    outras_despesas_formatadas = locale.currency(outras_despesas, grouping=True)
-    aci_enviada_formatada = locale.currency(aci_enviada, grouping=True)
+    saldo_formatado = format_currency_brl(config.saldo_inicial or 0)
+    receitas_formatadas = format_currency_brl(receitas)
+    despesas_formatadas = format_currency_brl(despesas)
+    saldo_final_formatado = format_currency_brl(saldo_final)
+    outras_receitas_formatadas = format_currency_brl(outras_receitas)
+    aci_recebida_formatada = format_currency_brl(aci_recebida)
+    outras_despesas_formatadas = format_currency_brl(outras_despesas)
+    aci_enviada_formatada = format_currency_brl(aci_enviada)
 
     st.subheader(f"Dashboard Financeiro - {config.ano_vigente}")
     st.write(f"UMP Federação: {config.ump_federacao}")
